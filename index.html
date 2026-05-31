@@ -123,11 +123,26 @@ sentence=sentence.trim();
 
 if(!sentence) return;
 
-let wrapped="";
+let words = sentence.split(" ");
+let line = "";
+let wrapped = "";
 
-for(let i=0;i<sentence.length;i+=25){
+words.forEach(word=>{
 
-wrapped+=sentence.substring(i,i+25)+"\n";
+if((line + word).length > 25){
+
+wrapped += line.trim() + "\n";
+line = word + " ";
+
+}else{
+
+line += word + " ";
+
+}
+
+});
+
+wrapped += line.trim() + "\n";
 
 }
 
