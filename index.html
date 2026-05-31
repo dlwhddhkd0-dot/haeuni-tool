@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -6,94 +7,135 @@
 <title>하은이 블로그 툴</title>
 
 <style>
+
 body{
-    font-family:'Pretendard',sans-serif;
-    background:#f5f7fb;
     margin:0;
     padding:20px;
+    background:#f5f6fa;
+    font-family:'Malgun Gothic',sans-serif;
 }
 
 .container{
-    max-width:1000px;
+    max-width:1100px;
     margin:auto;
 }
 
 h1{
     text-align:center;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    margin-bottom:20px;
 }
 
 textarea{
     width:100%;
-    height:300px;
+    height:350px;
+    resize:vertical;
     padding:15px;
-    border-radius:10px;
     border:1px solid #ddd;
+    border-radius:10px;
     font-size:15px;
+    box-sizing:border-box;
 }
 
 input{
     width:100%;
     padding:12px;
-    margin-bottom:10px;
-    border-radius:8px;
+    margin-bottom:12px;
+    border-radius:10px;
     border:1px solid #ddd;
+    box-sizing:border-box;
 }
 
 button{
-    padding:12px 20px;
+    padding:12px 18px;
     border:none;
-    background:#222;
-    color:white;
-    border-radius:8px;
+    border-radius:10px;
     cursor:pointer;
-    margin-top:10px;
+    font-size:15px;
 }
 
-.result{
-    margin-top:20px;
+.convert{
+    background:#222;
+    color:white;
+}
+
+.copy{
+    background:#4CAF50;
+    color:white;
 }
 
 .output{
     background:white;
     padding:20px;
-    border-radius:10px;
-    min-height:200px;
+    border-radius:12px;
+    min-height:300px;
     white-space:pre-wrap;
-    line-height:1.9;
+    line-height:2;
+    font-size:16px;
 }
 
 .stats{
-    margin-top:15px;
-    background:white;
-    padding:15px;
-    border-radius:10px;
+    display:flex;
+    gap:20px;
+    margin-bottom:15px;
+    flex-wrap:wrap;
 }
+
+.stat{
+    background:white;
+    padding:10px 15px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
 </style>
+
 </head>
+
 <body>
 
 <div class="container">
 
 <h1>하은이 블로그 툴</h1>
 
+<div class="card">
+
 <input type="text" id="keyword" placeholder="키워드 입력">
 
 <textarea id="inputText" placeholder="원고 붙여넣기"></textarea>
 
-<button onclick="convertText()">모바일 최적화</button>
+<br><br>
 
-<div class="result">
+<button class="convert" onclick="convertText()">모바일 정렬</button>
+
+</div>
 
 <div class="stats">
-<p>공백 제외 글자수 : <span id="charCount">0</span></p>
-<p>키워드 횟수 : <span id="keywordCount">0</span></p>
+
+<div class="stat">
+공백 제외 글자수 :
+<span id="charCount">0</span>
+</div>
+
+<div class="stat">
+키워드 횟수 :
+<span id="keywordCount">0</span>
+</div>
+
 </div>
 
 <div class="output" id="output"></div>
 
-<button onclick="copyText()">복사하기</button>
+<br>
 
-</div>
+<button class="copy" onclick="copyText()">복사하기</button>
 
 </div>
 
@@ -101,60 +143,61 @@ button{
 
 function convertText(){
 
-let text=document.getElementById("inputText").value;
-let keyword=document.getElementById("keyword").value;
+let text=document.getElementById("inputText").value.trim();
 
-text=text
-.replace(/제목:.*/gi,"")
-.replace(/"/g,"")
-.trim();
+let keyword=document.getElementById("keyword").value.trim();
 
-const sentences=text.match(/[^.!?]+[.!?]?/g)||[];
+if(!text){
+
+alert("원고를 입력하세요.");
+
+return;
+
+}
+
+const paragraphs=text.split(/\n\s*\n|\r\n\s*\r\n/);
 
 let result="";
-let section=1;
-let count=0;
 
-result+=section+"\n\n";
+paragraphs.forEach(paragraph=>{
 
-sentences.forEach(sentence=>{
+paragraph=paragraph.replace(/\n/g," ").trim();
 
-sentence=sentence.trim();
+if(!paragraph) return;
 
-if(!sentence) return;
+let words=paragraph.split(/\s+/);
 
-let words = sentence.split(" ");
-let line = "";
-let wrapped = "";
+let line="";
+
+let lineCount=0;
 
 words.forEach(word=>{
 
-if((line + word).length > 25){
+if((line+word).length>28){
 
-wrapped += line.trim() + "\n";
-line = word + " ";
+result+=line.trim()+"\n";
+
+line=word+" ";
+
+lineCount++;
+
+if(lineCount%3===0){
+
+result+="\n";
+
+}
 
 }else{
 
-line += word + " ";
+line+=word+" ";
 
 }
 
 });
 
-wrapped += line.trim() + "\n";
+if(line.trim()){
 
-}
-
-result+=wrapped+"\n";
-
-count++;
-
-if(count>=4){
-
-section++;
-result+="\n"+section+"\n\n";
-count=0;
+result+=line.trim()+"\n\n";
 
 }
 
@@ -163,14 +206,16 @@ count=0;
 document.getElementById("output").innerText=result;
 
 let noSpace=result.replace(/\s/g,"");
+
 document.getElementById("charCount").innerText=noSpace.length;
 
 if(keyword){
 
 let regex=new RegExp(keyword,"g");
-let keywordCount=(result.match(regex)||[]).length;
 
-document.getElementById("keywordCount").innerText=keywordCount;
+let count=(result.match(regex)||[]).length;
+
+document.getElementById("keywordCount").innerText=count;
 
 }else{
 
@@ -182,7 +227,7 @@ document.getElementById("keywordCount").innerText=0;
 
 function copyText(){
 
-let text=document.getElementById('output').innerText;
+let text=document.getElementById("output").innerText;
 
 navigator.clipboard.writeText(text);
 
