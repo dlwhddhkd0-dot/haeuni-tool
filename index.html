@@ -7,11 +7,9 @@
 <title>하은이 블로그 툴</title>
 
 <style>
-
 body{
     font-family:Malgun Gothic,sans-serif;
     background:#f5f5f5;
-    margin:0;
     padding:20px;
 }
 
@@ -20,62 +18,46 @@ body{
     margin:auto;
 }
 
-.card{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:20px;
-}
-
 textarea{
     width:100%;
-    height:350px;
+    height:300px;
     padding:15px;
     box-sizing:border-box;
-    border:1px solid #ddd;
-    border-radius:10px;
-    resize:vertical;
 }
 
 input{
     width:100%;
-    padding:12px;
-    box-sizing:border-box;
+    padding:10px;
     margin-bottom:10px;
-    border:1px solid #ddd;
-    border-radius:10px;
+    box-sizing:border-box;
 }
 
 button{
-    padding:12px 20px;
-    border:none;
-    border-radius:10px;
+    padding:10px 20px;
     cursor:pointer;
 }
 
-.output{
-    background:white;
+#output{
+    margin-top:20px;
+    background:#fff;
     padding:20px;
-    border-radius:12px;
     white-space:pre-wrap;
-    line-height:2;
     min-height:300px;
+    border:1px solid #ddd;
 }
 
-.stats{
-    margin:15px 0;
+.info{
+    margin-top:15px;
 }
-
 </style>
 
 </head>
+
 <body>
 
 <div class="container">
 
-<div class="card">
-
-<h2>하은이 블로그 툴</h2>
+<h1>하은이 블로그 툴</h1>
 
 <input type="text" id="keyword" placeholder="키워드 입력">
 
@@ -85,23 +67,17 @@ button{
 
 <button onclick="convertText()">모바일 정렬</button>
 
-</div>
-
-<div class="stats">
-
-공백 제외 글자수 : <span id="charCount">0</span>
-
-<br><br>
-
-키워드 횟수 : <span id="keywordCount">0</span>
-
-</div>
-
-<div class="output" id="output"></div>
-
-<br>
-
 <button onclick="copyText()">복사하기</button>
+
+<div class="info">
+공백제외 글자수 :
+<span id="charCount">0</span>
+<br><br>
+키워드 횟수 :
+<span id="keywordCount">0</span>
+</div>
+
+<div id="output"></div>
 
 </div>
 
@@ -109,65 +85,44 @@ button{
 
 function convertText(){
 
-let text=document.getElementById("inputText").value.trim();
+const text=document.getElementById("inputText").value;
 
-let keyword=document.getElementById("keyword").value.trim();
+const keyword=document.getElementById("keyword").value;
 
-if(!text){
-
-alert("원고를 입력하세요.");
-
-return;
-
-}
-
-text=text.replace(/\.\s*/g,".\n\n");
-
-let paragraphs=text.split(/\n\s*\n/);
+let words=text.split(" ");
 
 let result="";
-
-paragraphs.forEach(paragraph=>{
-
-paragraph=paragraph.trim();
-
-if(!paragraph) return;
-
-let words=paragraph.split(/\s+/);
-
 let line="";
 
-words.forEach(word=>{
+for(let i=0;i<words.length;i++){
 
-if((line+word).length>24){
+if((line + words[i]).length > 24){
 
-result+=line.trim()+"\n";
+result += line.trim() + "\n";
 
-line=word+" ";
+line = words[i] + " ";
 
 }else{
 
-line+=word+" ";
+line += words[i] + " ";
 
 }
 
-});
+}
 
-result+=line.trim()+"\n\n";
-
-});
+result += line.trim();
 
 document.getElementById("output").innerText=result;
 
-let noSpace=result.replace(/\s/g,"");
+const noSpace=result.replace(/\s/g,"");
 
 document.getElementById("charCount").innerText=noSpace.length;
 
 if(keyword){
 
-let regex=new RegExp(keyword,"g");
+const regex=new RegExp(keyword,"g");
 
-let count=(result.match(regex)||[]).length;
+const count=(result.match(regex)||[]).length;
 
 document.getElementById("keywordCount").innerText=count;
 
@@ -181,11 +136,11 @@ document.getElementById("keywordCount").innerText=0;
 
 function copyText(){
 
-let text=document.getElementById("output").innerText;
+const text=document.getElementById("output").innerText;
 
 navigator.clipboard.writeText(text);
 
-alert("복사 완료!");
+alert("복사 완료");
 
 }
 
