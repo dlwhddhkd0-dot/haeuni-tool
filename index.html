@@ -101,36 +101,65 @@ button{
 
 function convertText(){
 
-let text=document.getElementById('inputText').value;
-let keyword=document.getElementById('keyword').value;
+let text=document.getElementById("inputText").value;
+let keyword=document.getElementById("keyword").value;
 
-let sentences=text
-.replace(/\n/g,' ')
-.split(/(?<=[.!?다요죠])/);
+text=text
+.replace(/제목:.*/gi,"")
+.replace(/"/g,"")
+.trim();
 
-let result='';
+const sentences=text.match(/[^.!?]+[.!?]?/g)||[];
 
-sentences.forEach(s=>{
-if(s.trim().length>0){
-result+=s.trim()+"\n\n";
+let result="";
+let section=1;
+let count=0;
+
+result+=section+"\n\n";
+
+sentences.forEach(sentence=>{
+
+sentence=sentence.trim();
+
+if(!sentence) return;
+
+let wrapped="";
+
+for(let i=0;i<sentence.length;i+=25){
+
+wrapped+=sentence.substring(i,i+25)+"\n";
+
 }
+
+result+=wrapped+"\n";
+
+count++;
+
+if(count>=4){
+
+section++;
+result+="\n"+section+"\n\n";
+count=0;
+
+}
+
 });
 
-document.getElementById('output').innerText=result;
+document.getElementById("output").innerText=result;
 
-let noSpace=result.replace(/\s/g,'');
-document.getElementById('charCount').innerText=noSpace.length;
+let noSpace=result.replace(/\s/g,"");
+document.getElementById("charCount").innerText=noSpace.length;
 
 if(keyword){
 
-let regex=new RegExp(keyword,'g');
-let count=(result.match(regex)||[]).length;
+let regex=new RegExp(keyword,"g");
+let keywordCount=(result.match(regex)||[]).length;
 
-document.getElementById('keywordCount').innerText=count;
+document.getElementById("keywordCount").innerText=keywordCount;
 
 }else{
 
-document.getElementById('keywordCount').innerText=0;
+document.getElementById("keywordCount").innerText=0;
 
 }
 
